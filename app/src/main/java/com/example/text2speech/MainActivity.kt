@@ -16,6 +16,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.text2speech.steps.PoseStep
+import com.example.text2speech.steps.Step
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -66,7 +68,15 @@ class MainActivity : AppCompatActivity() {
             }
         }
         startListenBtn.setOnClickListener {
+
             startListeningBtnAction(mTTS)
+        }
+        yogaStartBtn.setOnClickListener{
+            var curr_step: Step = PoseStep("hi",0,mTTS)
+            while(!curr_step.isEndStep()){
+                curr_step.action()
+                curr_step = curr_step.next()!!
+            }
         }
     }
 
