@@ -72,12 +72,17 @@ class MainActivity : AppCompatActivity() {
             startListeningBtnAction(mTTS)
         }
         yogaStartBtn.setOnClickListener{
-            GlobalScope.launch{
-            var curr_step: Step = PoseStep("hi",0,mTTS)
-            while(!curr_step.isEndStep()){
-                curr_step.action()
-                curr_step = curr_step.next()!!
+            try {
+                GlobalScope.launch {
+                    var curr_step: Step = PoseStep("hi", 3, mTTS)
+                    while (!curr_step.isEndStep()) {
+                        curr_step.action()
+                        curr_step = curr_step.next()!!
+                    }
+                }
             }
+            catch (ex: Exception){
+                print(ex.message)
             }
         }
     }
@@ -210,6 +215,7 @@ class MainActivity : AppCompatActivity() {
             if (grantResults.isEmpty() || grantResults[0]!=PackageManager.PERMISSION_GRANTED) {
                 speechRecognizer.startListening(intent)
             } else {
+                print(grantResults)
                 Toast.makeText(this,
                     "Permissions not granted by the user.",
                     Toast.LENGTH_SHORT).show()

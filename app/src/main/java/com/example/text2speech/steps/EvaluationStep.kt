@@ -12,9 +12,11 @@ class EvaluationStep(pose:String,id:Int,speaker: TextToSpeech):Step(pose,id,spea
             this.setNextStep(PoseStep(pose, this.curr_id,this.speaker))
         else {
             if(curr_id==4){
-                this.setNextStep(EndStep(pose, this.curr_id + 1, this.speaker))
+                this.setNextStep(EndStep(pose, this.curr_id, this.speaker))
             }
-            this.setNextStep(PoseStep(pose, this.curr_id + 1, this.speaker))
+            else {
+                this.setNextStep(PoseStep(pose, this.curr_id + 1, this.speaker))
+            }
         }
     }
 }
