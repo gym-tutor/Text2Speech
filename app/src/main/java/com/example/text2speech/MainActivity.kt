@@ -72,10 +72,12 @@ class MainActivity : AppCompatActivity() {
             startListeningBtnAction(mTTS)
         }
         yogaStartBtn.setOnClickListener{
+            GlobalScope.launch{
             var curr_step: Step = PoseStep("hi",0,mTTS)
             while(!curr_step.isEndStep()){
                 curr_step.action()
                 curr_step = curr_step.next()!!
+            }
             }
         }
     }
