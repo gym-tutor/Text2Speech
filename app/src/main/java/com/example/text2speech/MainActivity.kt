@@ -5,6 +5,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.speech.RecognitionListener
@@ -23,6 +24,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,6 +33,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var speechRecognizer:SpeechRecognizer
     private val RECORD_REQUEST_CODE=101
     private val TAG = "RecognitionListener"
+    lateinit var cameraHelper:CameraHelper
+    private lateinit var executor: ExecutorService
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -39,6 +45,8 @@ class MainActivity : AppCompatActivity() {
                 mTTS.language= Locale.UK
             }
         })
+        cameraHelper = CameraHelper(this)
+        cameraHelper.startCamera(this)
 
         val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
         if (permission != PackageManager.PERMISSION_GRANTED) {
@@ -72,19 +80,22 @@ class MainActivity : AppCompatActivity() {
             startListeningBtnAction(mTTS)
         }
         yogaStartBtn.setOnClickListener{
+            cameraHelper.takePhoto()
             try {
                 GlobalScope.launch {
-                    var curr_step: Step = PoseStep("hi", 3, mTTS)
-                    while (!curr_step.isEndStep()) {
-                        curr_step.action()
-                        curr_step = curr_step.next()!!
-                    }
+                    while(cameraHelper.getImage() == null)continue
+                    var bitmapImage:Bitmap?= cameraHelper.getImage()
+                    Log.d("image", bitmapImage.toString())
+                    Log.e("in lauch scope","after thread")
+                    var yogaPose = YogaPose("Warrior II",mTTS,cameraHelper)
+                    yogaPose.start()
                 }
             }
             catch (ex: Exception){
                 print(ex.message)
             }
         }
+        executor = Executors.newSingleThreadExecutor()
     }
 
     override fun onPause() {
